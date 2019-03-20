@@ -1,5 +1,5 @@
-import 'bootstrap/dist/css/bootstrap.css';
-import 'font-awesome/css/font-awesome.css';
+import './bootstrap.min.css';
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { applyMiddleware,createStore } from 'redux'
