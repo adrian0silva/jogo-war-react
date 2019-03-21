@@ -15,7 +15,7 @@ const INITIAL_STATE = {
         0: {
             ID: 0,
             NOME: "ARGENTINA",
-            VALOR: 40,
+            VALOR: 20,
             JOGADOR: "PLAYER",
             ACIONADO: false,
             BORDAS: false,
@@ -34,7 +34,7 @@ const INITIAL_STATE = {
         1: {
             ID: 1,
             NOME: "BRASIL",
-            VALOR: 200,
+            VALOR: 20,
             JOGADOR: "INIMIGO",
             ACIONADO: false,
             BORDAS: false,
@@ -53,7 +53,7 @@ const INITIAL_STATE = {
         2:{
             ID: 2,
             NOME: "CHILE",
-            VALOR: 10,
+            VALOR: 20,
             JOGADOR: "PLAYER",
             ACIONADO: false,
             BORDAS: false,
