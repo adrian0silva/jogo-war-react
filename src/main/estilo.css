@@ -189,7 +189,7 @@ button:not(.btn-sm) {
 .meu_popover_conteudo {
     opacity: 3;
     position: absolute;
-    left: 0px;
+    left: 70px;
     transform: translate(0, 10px);
     background-color: gray;
     padding: 1.5rem;
@@ -247,5 +247,5 @@ button:not(.btn-sm) {
     transition: all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97);
   }
   .popover__message {
-    text-align: center;
+    text-align: left;
   }
