@@ -34,7 +34,7 @@ const INITIAL_STATE = {
         1: {
             ID: 1,
             NOME: "BRASIL",
-            VALOR: 20,
+            VALOR: 200,
             JOGADOR: "INIMIGO",
             ACIONADO: false,
             BORDAS: false,
@@ -250,6 +250,13 @@ export default (state = INITIAL_STATE,action) => {
             for(var a = 0;a < 3;a++){
                 if(state.pais[a].JOGADOR == "PLAYER") 
                     novaQuantidade = novaQuantidade + 2
+            }
+            if(novaQuantidade == 6) {
+                alert("VOCE GANHOU!")
+                document.write("VOCE GANHOU!")
+            } else {
+                alert("VOCE PERDEU!")
+                document.write("VOCE PERDEU!")    
             }
             return {
                 ...state,
