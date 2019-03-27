@@ -8,6 +8,7 @@ class Pais extends Component {
         super(props)
 
         this.state = {
+            quantidadeDePaises: 12,
             ação: "deploy",
             plusAction: "btn btn-danger btn-sm",
             arrowAction: "btn btn-danger btn-sm",
@@ -15,7 +16,8 @@ class Pais extends Component {
             value: '',
             setaAnimada: <div></div>,
             direcao: "",
-            cursor: ""
+            cursor: "",
+            simulacao: false
         }
 
         this.changeColor = this.changeColor.bind(this)
@@ -43,7 +45,7 @@ class Pais extends Component {
     changeColor(action) {
         
        if(action == 0) {
-            for(var a = 0;a < 3;a++) {
+            for(var a = 0;a < this.state.quantidadeDePaises;a++) {
                 if(this.props.pais[a].ACIONADO) {
                     this.props.pais[a].ACIONADO = false
                 }
@@ -59,7 +61,7 @@ class Pais extends Component {
                             </div>
             });
        } else {
-            for(var a = 0;a < 3;a++) {
+            for(var a = 0;a < this.state.quantidadeDePaises;a++) {
                 if(this.props.pais[a].BORDAS) {
                     this.props.pais[a].BORDAS = false
                 }
@@ -71,7 +73,17 @@ class Pais extends Component {
             });
        }
     }
-    btnAction(algo,seila,op) {
+
+    removerConteudo(){
+        for(var cont = 0; cont < this.state.quantidadeDePaises;cont++) {
+            if(this.props.pais[cont].ACIONADO) 
+                this.props.pais[cont].ACIONADO = false
+            if(this.props.pais[cont].BORDAS) 
+                this.props.pais[cont].BORDAS = false
+        }
+    }
+    btnAction(var1,var2,op) {
+        this.removerConteudo();
 
         if(this.props.quantidade == 0) {
            this.state.ação = "ataque" 
@@ -79,22 +91,22 @@ class Pais extends Component {
            this.changeColor(1);
         }
         if(this.state.ação == "deploy") {
-            this.props.adicionar(algo,seila);
-            for(var a = 0;a < 3;a++) {
+            this.props.adicionar(var1,var2);
+            for(var a = 0;a < this.props.quantidadeDePaises;a++) {
                 if(this.props.pais[a].BORDAS) {
                     this.props.pais[a].BORDAS = false
                 }
             }
-            this.props.pais[algo].BORDAS = true
+            this.props.pais[var1].BORDAS = true
             this.changeColor(0);
         } else {
-            for(var a = 0;a < 3;a++) {
+            for(var a = 0;a < this.props.quantidadeDePaises;a++) {
                 if(this.props.pais[a].ACIONADO) {
                     this.props.pais[a].ACIONADO = false
                 }
             }
-            this.props.pais[algo].BORDAS = false
-            this.props.pais[algo].ACIONADO = true
+            this.props.pais[var1].BORDAS = false
+            this.props.pais[var1].ACIONADO = true
             this.forceUpdate()
         }
     }
@@ -104,46 +116,46 @@ class Pais extends Component {
     }
     
     commitando(isto) {
+        this.removerConteudo();
+        this.setState({simulacao: true})
         if(this.props.iaAtivada)
             this.props.ativar_ia()    
         
         
         var contador = 0;
-        for(var a = 0;a < 3;a++) {
-            if(this.props.pais[a].ACIONADO) {
-                this.props.pais[a].ACIONADO = false
-            }
-        }
+        
         this.recursiva(contador)
         for(var aux=0;aux < this.props.pais.length;aux++) {
             this.props.pais[aux].TOTAL_DE_ATAQUES = 0
         }
+      
     }
     recursiva(cont){
         var pais = this.props.pais
         var transition = ""
         var positLEFT = pais[this.props.listaDeAtaques[cont][0]].POSITION.LEFT
         var positionTop = pais[this.props.listaDeAtaques[cont][0]].POSITION.TOP
-        if(pais[this.props.listaDeAtaques[cont][0]].JOGADOR){
+       /* if(pais[this.props.listaDeAtaques[cont][0]].JOGADOR){*/
             if(pais[this.props.listaDeAtaques[cont][0]].POSITION.LEFT > pais[this.props.listaDeAtaques[cont][1]].POSITION.LEFT)
                 transition = "setaEsquerdaAnimada"
             else 
                 transition = "setaDireitaAnimada"
                 positLEFT = parseInt(positLEFT) + 50
-        }
+        
         if(this.props.listaDeAtaques[cont][3] == "CIMA") {
-
+            transition = "setaCimaAnimada"
         } else if(this.props.listaDeAtaques[cont][3] == "ESQUERDA") {
             transition = "setaEsquerdaAnimada"
         } else if(this.props.listaDeAtaques[cont][3] == "DIREITA") {
             transition = "setaDireitaAnimada"
-            positLEFT = parseInt(positLEFT) + 25
+        } else if(this.props.listaDeAtaques[cont][3] == "BAIXO") {
+            transition = "setaBaixoAnimada"
         }
-        const estiloSetaAnimada = { 
+        const ESTILO_SETA_ANIMADA = { 
             left: positLEFT+'px',top: positionTop+'px',color:"red"
         }
         this.setState({
-            setaAnimada: <div className={transition} style={estiloSetaAnimada}>{this.props.listaDeAtaques[cont][2]}</div>
+            setaAnimada: <div className={transition} style={ESTILO_SETA_ANIMADA}>{this.props.listaDeAtaques[cont][2]}</div>
         });
         this.props.commit(cont)
         var refreshId = setInterval(() => {
@@ -151,28 +163,29 @@ class Pais extends Component {
                 cont++;
                 this.recursiva(cont)
             } else {
-                this.setState({setaAnimada: "",cursor: "pointer",ação: "deploy"})
+                this.setState({setaAnimada: "",cursor: "pointer",ação: "deploy",simulacao: false})
                 this.props.refresh()
                 clearInterval(refreshId)
             }
         }, 4000);
+      
     }
     render() {
         
         //for(var value of this.props.listaDeOrdens){}
 
         const renderRows = () => {
-            const listaRender = [];
+            const LISTA_RENDER = [];
             for (let i = 0; i < this.props.listaDeOrdens.length; i++) {
-                listaRender.push({
+                LISTA_RENDER.push({
                     conteudo: <li>
-                                <i className="fa fa-close btn btn-danger btn-sm" onClick={this.cancelar.bind(this,i)}></i>
+                                <i className="btn btn-danger btn-sm" onClick={this.cancelar.bind(this,i)}>X</i>
                                 <small>Deploy {this.props.listaDeOrdens[i][0]} To {this.props.listaDeOrdens[i][1]}</small>
                             </li> 
                 });
             }
             return (<div>
-                {listaRender.map((lista, index) => (
+                {LISTA_RENDER.map((lista, index) => (
                     <p key={index}>{lista.conteudo}</p>
                 ))}
                 </div>);
@@ -180,12 +193,12 @@ class Pais extends Component {
         
 
         const renderAtaques = () => {
-            const listaAtaques = [];
+            const LISTA_ATAQUES = [];
             const pais = this.props.pais
             for (let i = 0; i < this.props.listaDeAtaques.length; i++) {
-                listaAtaques.push({
+                LISTA_ATAQUES.push({
                     conteudo: <li>
-                                <i className="fa fa-close btn btn-danger btn-sm" onClick={this.cancelarAtaque.bind(this,i)}></i>
+                                <i className=" btn btn-danger btn-sm" onClick={this.cancelarAtaque.bind(this,i)}>X</i>
                                 <small>
                                     {this.props.listaDeAtaques[i][2]} armies from {pais[this.props.listaDeAtaques[i][0]].NOME} Will attack/transfer to {pais[this.props.listaDeAtaques[i][1]].NOME}
                                 </small>
@@ -193,22 +206,20 @@ class Pais extends Component {
                 });
             }
             return (<div>
-                {listaAtaques.map((lista, index) => (
+                {LISTA_ATAQUES.map((lista, index) => (
                     <p key={index}>{lista.conteudo}</p>
                 ))}
                 </div>);
         }
 
-        const hidden = {visibility: "hidden"}
-        const initial = {visibility: "initial"}
-        const block = {display: "block"}
-        const none = {display: "none"}
-        const bordas = {border: "5px solid yellow"}
-        const opaco = {opacity: 0.7}
-        const zoom = {zoom: 1.3}
-        const inlineBlock = {display: "inline-block"}
+        const HIDDEN = {visibility: "hidden"}
+        const INITIAL = {visibility: "initial"}
+        const BLOCK = {display: "block"}
+        const NONE = {display: "none"}
+        const BORDAS = {border: "5px solid yellow"}
+        const OPACO = {opacity: 0.7}
         var listaDePaises = {} 
-        for(var contadorDePaises = 0;contadorDePaises < 3;contadorDePaises++){
+        for(var contadorDePaises = 0;contadorDePaises < this.state.quantidadeDePaises;contadorDePaises++){
             var operador;
             if(this.props.pais[contadorDePaises].JOGADOR == "PLAYER") {
                 operador = "btn btn-success"
@@ -219,20 +230,20 @@ class Pais extends Component {
             }
             listaDePaises[contadorDePaises] =
             <div className="popover__wrapper" >
-                    <button className={operador} style={(this.props.pais[contadorDePaises].BORDAS) ? bordas : block} onClick={this.btnAction.bind(this,contadorDePaises,operador)}
+                    <button className={operador} style={(this.props.pais[contadorDePaises].BORDAS) ? BORDAS : BLOCK} onClick={this.btnAction.bind(this,contadorDePaises,operador)}
                         disabled={(this.props.pais[contadorDePaises].JOGADOR == "PLAYER") ? false : true}>
-                        <div style={(this.props.pais[contadorDePaises].ACIONADO) ? block : none}>
+                        <div style={(this.props.pais[contadorDePaises].ACIONADO) ? BLOCK : NONE}>
                             <span className="cima" 
-                                style={(typeof this.props.pais[contadorDePaises].SETAS.CIMA == "number") ? initial : hidden}
+                                style={(typeof this.props.pais[contadorDePaises].SETAS.CIMA == "number") ? INITIAL : HIDDEN}
                                 onClick={this.atacou.bind(this, contadorDePaises,this.props.pais[contadorDePaises].SETAS.CIMA,"CIMA")}></span>
                             <span className="esquerda"
-                                style={(typeof this.props.pais[contadorDePaises].SETAS.ESQUERDA == "number") ? initial : hidden}
+                                style={(typeof this.props.pais[contadorDePaises].SETAS.ESQUERDA == "number") ? INITIAL : HIDDEN}
                                 onClick={this.atacou.bind(this, contadorDePaises,this.props.pais[contadorDePaises].SETAS.ESQUERDA,"ESQUERDA")}></span>
                             <span className="direita"
-                                style={(typeof this.props.pais[contadorDePaises].SETAS.DIREITA == "number") ? initial : hidden}
+                                style={(typeof this.props.pais[contadorDePaises].SETAS.DIREITA == "number") ? INITIAL : HIDDEN}
                                 onClick={this.atacou.bind(this, contadorDePaises,this.props.pais[contadorDePaises].SETAS.DIREITA,"DIREITA")}></span>
                             <span className="baixo"
-                                style={(typeof this.props.pais[contadorDePaises].SETAS.BAIXO == "number") ? initial : hidden}
+                                style={(typeof this.props.pais[contadorDePaises].SETAS.BAIXO == "number") ? INITIAL : HIDDEN}
                                 onClick={this.atacou.bind(this, contadorDePaises,this.props.pais[contadorDePaises].SETAS.BAIXO,"BAIXO")}></span>
                         </div>
                         {this.props.pais[contadorDePaises].VALOR}
@@ -243,8 +254,8 @@ class Pais extends Component {
            </div>
         }
         return (
-            <div>
-                <main className="main" style={(this.props.modal) ? opaco : block}>
+            <div style={(this.state.simulacao) ? {pointerEvents:"none"} : {pointerEvents:"auto"} }>
+                <main className="main" style={(this.props.modal) ? OPACO : BLOCK}>
                     <div className="divActions">
                         <span className={this.state.plusAction} onClick={() => this.changeColor(0)}>
                             <i className="fa fa-plus"></i>
@@ -269,6 +280,33 @@ class Pais extends Component {
                         <div className="pais2">
                             {listaDePaises[2]}
                         </div>
+                        <div className="pais3">
+                            {listaDePaises[3]}
+                        </div>
+                        <div className="pais4">
+                            {listaDePaises[4]}
+                        </div>
+                        <div className="pais5">
+                            {listaDePaises[5]}
+                        </div>
+                        <div className="pais6">
+                            {listaDePaises[6]}
+                        </div>
+                        <div className="pais7">
+                            {listaDePaises[7]}
+                        </div>
+                        <div className="pais8">
+                            {listaDePaises[8]}
+                        </div>
+                        <div className="pais9">
+                            {listaDePaises[9]}
+                        </div>
+                        <div className="pais10">
+                            {listaDePaises[10]}
+                        </div>
+                        <div className="pais11">
+                            {listaDePaises[11]}
+                        </div>
                     </section>
                     <section className="sectionOrders">
                         <div>
@@ -284,7 +322,7 @@ class Pais extends Component {
                     </section>
                 </main>
                 <section className="modalSection">              
-                        <div style={(this.props.modal) ? block : none}>
+                        <div style={(this.props.modal) ? BLOCK : NONE}>
                             <div>
                                 <h1>ATTACK OR TRANSFER</h1>
                                 <th>
@@ -300,7 +338,7 @@ class Pais extends Component {
                                 <br/>
                                 <form onSubmit={this.handleSubmit}>
                                     <input type="number" value={this.state.value} onChange={this.handleChange}
-                                    max={(typeof this.props.paisAtacka != "undefined") ? this.props.pais[this.props.paisAtacka].VALOR - this.props.pais[this.props.paisAtacka].TOTAL_DE_ATAQUES : false}  />
+                                    min={0} max={(typeof this.props.paisAtacka != "undefined") ? this.props.pais[this.props.paisAtacka].VALOR - this.props.pais[this.props.paisAtacka].TOTAL_DE_ATAQUES : false}  />
                                     <input type="submit" value="Okay" className="btn btn-success btn-sm inputSubmit" />                        
                                 </form>
                                 <button className="btn btn-danger btn-sm " onClick={this.props.sair}>Cancel</button>
