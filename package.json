@@ -39,19 +39,6 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "bootstrap": "^4.3.1",
-    "create-react-app": "^2.1.8",
-    "font-awesome": "^4.7.0",
-    "heroku": "^7.22.7",
-    "react": "^15.6.2",
-    "react-dom": "^15.6.2",
-    "react-redux": "^5.1.1",
-    "react-router": "^3.0.2",
-    "react-strap": "0.0.1",
-    "reactstrap": "^7.1.0",
-    "redux": "^3.6.0",
-    "redux-multi": "^0.1.12",
-    "redux-promise": "^0.5.3",
-    "redux-thunk": "^2.2.0"
+
   }
 }
